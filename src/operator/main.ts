@@ -1,10 +1,12 @@
 import { AudioManager } from "../AudioManager";
 import { Settings } from "../Settings";
+import { TextToSpeechManager } from "../TextToSpeechManager";
 import { Operator } from "./Operator";
 
 document.addEventListener("DOMContentLoaded", function () {
     const settings = new Settings();
     const audioManager = new AudioManager();
+    const ttsManager = new TextToSpeechManager("YOUR_ELEVENLABS_API_KEY", "VOICE_ID");
 
     window.addEventListener("error", function (errorEvent) {
         const errorDiv = document.createElement("div");
@@ -20,6 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add global variable so we can access the operator instance in the web browser debugger.
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-    (window as any).operator = new Operator(audioManager, settings);
+    (window as any).operator = new Operator(audioManager, settings, ttsManager);
 
 });

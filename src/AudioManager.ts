@@ -31,6 +31,8 @@ export class AudioManager {
     public readonly MUSIC_GAME_END: HTMLAudioElement;
     public readonly MUSIC_GAME_START: HTMLAudioElement;
     public readonly DONE_READING_CLUE_QUESTION: HTMLAudioElement;
+    public readonly ANSWER_CORRECT_ALTS: HTMLAudioElement[];
+    public readonly ANSWER_WRONG_ALTS: HTMLAudioElement[];
 
     public constructor() {
         this.ANSWER_CORRECT = querySelectorAndCheck<HTMLAudioElement>(document, "audio#answer-correct");
@@ -43,6 +45,8 @@ export class AudioManager {
         this.MUSIC_GAME_END = querySelectorAndCheck<HTMLAudioElement>(document, "audio#music-game-end");
         this.MUSIC_GAME_START = querySelectorAndCheck<HTMLAudioElement>(document, "audio#music-game-start");
         this.DONE_READING_CLUE_QUESTION = querySelectorAndCheck<HTMLAudioElement>(document, "audio#done-reading-clue-question");
+        this.ANSWER_CORRECT_ALTS = Array.from(document.querySelectorAll<HTMLAudioElement>("audio.answer-correct-alt"));
+        this.ANSWER_WRONG_ALTS = Array.from(document.querySelectorAll<HTMLAudioElement>("audio.answer-wrong-alt"));
     }
 
     public playInOrder(...audioElements: HTMLAudioElement[]): void {
@@ -73,5 +77,17 @@ export class AudioManager {
 
         allAudioElements[indexToPlayNow].addEventListener("ended", onAudioEnd);
         allAudioElements[indexToPlayNow].play();
+    }
+
+    public playRandomCorrectSound(): void {
+        const pool = [this.ANSWER_CORRECT, ...this.ANSWER_CORRECT_ALTS];
+        const clip = pool[Math.floor(Math.random() * pool.length)];
+        clip.play();
+    }
+
+    public playRandomWrongSound(): void {
+        const pool = [this.ANSWER_WRONG_OR_ANSWER_TIMEOUT, ...this.ANSWER_WRONG_ALTS];
+        const clip = pool[Math.floor(Math.random() * pool.length)];
+        clip.play();
     }
 }
