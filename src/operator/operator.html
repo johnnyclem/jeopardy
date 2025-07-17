@@ -4,7 +4,9 @@
 <head>
     <title>J operator</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../tailwind.generated.css">
     <link rel="stylesheet" href="../../node_modules/chartist/dist/index.css">
     <link rel="stylesheet" href="../commonCss/common.css">
     <link rel="stylesheet" href="css/tabs.css">
@@ -111,9 +113,9 @@
 
     </div>
 
-    <div id="flex-container">
+    <div id="flex-container" class="min-h-screen flex flex-col">
 
-        <main>
+        <main class="flex-grow overflow-y-auto p-2">
 
             <div id="game-board-wrapper" style="display:none">
                 <!-- HTML comment to disable VS Code formatter is set by "html.format.unformattedContentDelimiter" in .vscode/settings.json -->
@@ -334,7 +336,7 @@
         </div>
 
 
-        <footer>
+        <footer class="mt-auto">
             <!-- Contents of the footer is created at runtime -->
         </footer>
 

@@ -4,7 +4,9 @@
 <head>
     <title>J presentation</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../tailwind.generated.css">
     <link rel="stylesheet" href="../../node_modules/chartist/dist/index.css">
     <link rel="stylesheet" href="font/korinna/korinna.css">
     <link rel="stylesheet" href="font/swiss911/swiss911.css">
@@ -77,16 +79,16 @@
         </div>
     </div>
 
-    <div id="flex-container">
+    <div id="flex-container" class="min-h-screen flex flex-col">
 
-        <header data-header-display="full">
+        <header data-header-display="full" class="p-2 text-center md:text-left">
             <progress id="game-round-timer"></progress>
             <span id="clue-category-in-header">category</span>
             <span id="clue-value-in-header">$0000</span>
             <progress id="state-machine"></progress>
         </header>
 
-        <main>
+        <main class="flex-grow flex justify-center items-center">
             <!--
             The presentation uses a slideshow metaphor. There is always exactly one
             slide visible at a time.
@@ -175,7 +177,7 @@
 
         </main>
 
-        <footer data-footer-display="full">
+        <footer data-footer-display="full" class="mt-auto">
             <!-- contents of the footer is generated at runtime -->
         </footer>
 
