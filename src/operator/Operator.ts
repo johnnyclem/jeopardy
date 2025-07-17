@@ -4,6 +4,7 @@ import { CountdownTimer } from "../CountdownTimer";
 import { FinalJeopardyTable } from "../FinalJeopardyTable";
 import { GameBoard } from "../GameBoard";
 import { Settings } from "../Settings";
+import { TextToSpeechManager } from "../TextToSpeechManager";
 import { Team, TeamSavedInLocalStorage, TeamState } from "../Team";
 import { querySelectorAndCheck } from "../commonFunctions";
 import { createGameEndLineChartOfMoneyOverTime, createGameEndPieChartsOfBuzzResults } from "../gameEndStatisticsCharts";
@@ -28,6 +29,7 @@ export class Operator {
 
     private readonly AUDIO_MANAGER: AudioManager;
     private readonly SETTINGS: Settings;
+    private readonly TTS_MANAGER: TextToSpeechManager;
     private readonly DIV_CLUE_WRAPPER: HTMLDivElement;
     private readonly DIV_CLUE_QUESTION: HTMLDivElement;
     private readonly DIV_CLUE_VALUE: HTMLDivElement;
@@ -89,9 +91,10 @@ export class Operator {
     private categoryCarouselIndex = -1;
     private teamIndexToPickClue = 0;
 
-    public constructor(audioManager: AudioManager, settings: Settings) {
+    public constructor(audioManager: AudioManager, settings: Settings, ttsManager: TextToSpeechManager) {
         this.AUDIO_MANAGER = audioManager;
         this.SETTINGS = settings;
+        this.TTS_MANAGER = ttsManager;
 
         this.DIV_CLUE_WRAPPER = querySelectorAndCheck(document, "div#clue-wrapper");
         this.DIV_CLUE_QUESTION = querySelectorAndCheck(document, "div#div-clue-question");
@@ -756,6 +759,8 @@ export class Operator {
         this.TR_QUESTION.style.display = ""; //show it by removing "display=none"
         this.TR_ANSWER.style.display = "none";
 
+        void this.TTS_MANAGER.playQuestion(this.gameRoundIndex, this.presentClue);
+
         // this.specialCategoryPromptHide();
     }
 
@@ -1218,6 +1223,7 @@ export class Operator {
     public gameRoundStartNext(): void {
         this.gameRoundIndex++;
         const gameRound = SCRAPED_GAME.ROUNDS[this.gameRoundIndex];
+        this.TTS_MANAGER.startRound(gameRound, this.gameRoundIndex);
         gameRound.CATEGORIES.forEach(category => category.specialCategory = checkSpecialCategory(category.NAME));
         this.gameBoard?.setGameRound(gameRound);
         this.DIV_CLUE_WRAPPER.style.display = "none";
