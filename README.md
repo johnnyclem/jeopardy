@@ -138,7 +138,47 @@ player using a video file committed to the repository.
 -->
 https://github.com/user-attachments/assets/5d5fbda3-2886-40ba-bed8-7e6227eca1c9
 
+## Extra features
 
+### Buzz timing chart
+
+When multiple teams buzz in for the same question, which team actually gets to say their answer can come down to fractions of a second of timing.
+
+To copy the TV show, buzzes made before the human operator finishes reading the question out loud result in the buzzer being locked out for &frac14; second. To learn more, see [How Does the Jeopardy Buzzer Work](https://www.jeopardy.com/jbuzz/behind-scenes/how-does-jeopardy-buzzer-work).
+
+This chart appears after each question to show who buzzed too early or too late. The charts in this section use simulated data to show all possible types of buzz:
+
+![Buzz timing chart overview](images-for-readme/buzz-timing-chart-overview.svg)
+
+The X axis is time relative to when the human operator pressed the spacebar to indicate they were done reading the question out loud. Buzzes made before that are locked out for &frac14; second.
+
+Each black dot represents a buzzer being pressed. Colored bars trailing the black dots show what the buzzer did. So in this example, from top to bottom:
+
+- Team 1 pressed their buzzer before the operator pressed space, causing their buzzer to be locked out, indicated by the orange bar. Team 1 was then first to press their buzzer *after* the operator pressed space, beating team 2, but their buzzer was still locked out so the buzz did not do anything.
+- Team 2 pressed their buzzer and were able to say an answer. The red bar indicates they either said an answer but it was wrong, or didn't say an answer in time.
+- Team 3 pressed their buzzer while team 2 was answering so nothing happened.
+- Team 4 pressed their buzzer, said their answer, and the green bar indicates they answered correctly.
+
+The time scale can be zoomed in to see automatically-generated numerical annotations:
+
+![Buzz timing chart zoomed in to show annotations](images-for-readme/buzz-timing-chart-zoomed-in.svg)
+
+### Game-end statistics charts
+
+At the end of each game, two charts let teams compare their gameplay. A line chart shows the rise and fall of each team's money, and a group of pie charts show how each team responded to the questions.
+
+The charts below are from from an actual game played in early 2025:
+
+<table>
+  <tr>
+    <td><img src="images-for-readme/line-chart-of-money-over-time.svg" alt="Line chart of money over time"></td>
+    <td><img src="images-for-readme/pie-charts-of-buzz-results.svg" alt="Pie chart of buzz results"></td>
+    </tr>
+</table>
+
+The line chart captures the game's excitement: team 4 (green line) secured the first question but stagnated while team 2 (orange line) chased team 3's (yellow line) growth and surpassed it biefly only to be outdone by team 1's (red line) quick rise. In the midgame team 3's early foundation was eroded as teams 1 & 2 traded first place, then team 4 rocketed to the lead but team 2 soon followed to overtake them in the endgame.
+
+The pie charts can quickly show whether the teams are balanced. To keep the game fun for everyone, I reshuffle team members if any team leading or lagging too much. These pie charts above show that this game was very well balanced (which is why I chose it to include here).
 
 ## "Clue" vs "question" vs "answer"
 
