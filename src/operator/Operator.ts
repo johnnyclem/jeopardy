@@ -9,10 +9,11 @@ import { Team, TeamSavedInLocalStorage, TeamState } from "../Team";
 import { querySelectorAndCheck } from "../commonFunctions";
 import { createGameEndLineChartOfMoneyOverTime, createGameEndPieChartsOfBuzzResults } from "../gameEndStatisticsCharts";
 import { Presentation } from "../presentation/Presentation";
+import { fetchRandomGame } from "../jservice";
 import { SCRAPED_GAME } from "../scrapedGame";
 import { checkSpecialCategory, SpecialCategory } from "../specialCategories";
 import { StateMachine } from "../stateMachine/StateMachine";
-import { RevealedClue } from "../typesForGame";
+import { Game, RevealedClue } from "../typesForGame";
 
 interface SavedGameInLocalStorage {
     readonly GAME_ROUND_TIMER_REMAINING_MILLISEC: number,
@@ -90,6 +91,7 @@ export class Operator {
     private gameRoundIndex = -1;
     private categoryCarouselIndex = -1;
     private teamIndexToPickClue = 0;
+    private gameData: Game = SCRAPED_GAME;
 
     public constructor(audioManager: AudioManager, settings: Settings, ttsManager: TextToSpeechManager) {
         this.AUDIO_MANAGER = audioManager;
@@ -153,7 +155,7 @@ export class Operator {
     /**
      * This method gets called from the Presentation instance in the other window.
      */
-    public onPresentationReady(presentationInstanceFromOtherWindow: Presentation): void {
+    public async onPresentationReady(presentationInstanceFromOtherWindow: Presentation): Promise<void> {
 
         window.focus(); //focus the operator window
 
@@ -170,10 +172,18 @@ export class Operator {
         this.GAME_ROUND_TIMER.addProgressElement(this.presentation.getProgressElementForGameTimer());
 
         this.stateMachine = new StateMachine(this.SETTINGS, this, this.presentation, this.AUDIO_MANAGER);
-
+        this.BUTTON_START_GAME.setAttribute("disabled", "disabled");
+        this.DIV_INSTRUCTIONS.innerHTML = "Loading questions...";
+        try {
+            this.gameData = await fetchRandomGame();
+        } catch (er) {
+            console.error("Failed to fetch game", er);
+            this.gameData = SCRAPED_GAME;
+        }
         this.BUTTON_START_GAME.removeAttribute("disabled");
         this.BUTTON_START_GAME.focus();
         this.DIV_INSTRUCTIONS.innerHTML = "Click the button to start the game.";
+
 
         /*
         In Firefox, when no other audio is playing from the page, the very beginning
@@ -1138,7 +1148,7 @@ export class Operator {
     }
 
     public categoryCarouselGetSpecialCategory(): SpecialCategory | undefined {
-        return SCRAPED_GAME.ROUNDS[this.gameRoundIndex].CATEGORIES[this.categoryCarouselIndex].specialCategory;
+        return this.gameData.ROUNDS[this.gameRoundIndex].CATEGORIES[this.categoryCarouselIndex].specialCategory;
     }
 
     /**
@@ -1152,7 +1162,7 @@ export class Operator {
     }
 
     private categoryCarouselShowText(): void {
-        const category = SCRAPED_GAME.ROUNDS[this.gameRoundIndex].CATEGORIES[this.categoryCarouselIndex];
+        const category = this.gameData.ROUNDS[this.gameRoundIndex].CATEGORIES[this.categoryCarouselIndex];
 
         const specialCategory = this.categoryCarouselGetSpecialCategory();
         if (specialCategory === undefined) {
@@ -1222,7 +1232,7 @@ export class Operator {
      */
     public gameRoundStartNext(): void {
         this.gameRoundIndex++;
-        const gameRound = SCRAPED_GAME.ROUNDS[this.gameRoundIndex];
+        const gameRound = this.gameData.ROUNDS[this.gameRoundIndex];
         this.TTS_MANAGER.startRound(gameRound, this.gameRoundIndex);
         gameRound.CATEGORIES.forEach(category => category.specialCategory = checkSpecialCategory(category.NAME));
         this.gameBoard?.setGameRound(gameRound);
@@ -1235,7 +1245,7 @@ export class Operator {
         const messageLines = [`Get ready for round ${this.gameRoundIndex + 1}.`];
         if (this.gameRoundIndex === 0) {
             // example format of the airdate string: "Thursday, July 12, 2018"
-            const split1 = SCRAPED_GAME.AIRDATE.split(", ");
+            const split1 = this.gameData.AIRDATE.split(", ");
             const year = split1[2];
             const monthAndDay = split1[1];
             const split2 = monthAndDay.split(" ");
@@ -1250,7 +1260,7 @@ export class Operator {
     }
 
     public gameRoundHasMore(): boolean {
-        return this.gameRoundIndex < SCRAPED_GAME.ROUNDS.length - 1;
+        return this.gameRoundIndex < this.gameData.ROUNDS.length - 1;
     }
 
     public toggleQuestionInAnswerSlide(): void {
@@ -1260,10 +1270,10 @@ export class Operator {
     public finalJeopardyStart(): void {
         this.presentation?.setClue({
             REVEALED_ON_TV_SHOW: true,
-            QUESTION: SCRAPED_GAME.FINAL_JEOPARDY.QUESTION,
-            ANSWER: SCRAPED_GAME.FINAL_JEOPARDY.ANSWER,
+            QUESTION: this.gameData.FINAL_JEOPARDY.QUESTION,
+            ANSWER: this.gameData.FINAL_JEOPARDY.ANSWER,
             VALUE: 0,
-            CATEGORY_NAME: SCRAPED_GAME.FINAL_JEOPARDY.CATEGORY,
+            CATEGORY_NAME: this.gameData.FINAL_JEOPARDY.CATEGORY,
             ROW_INDEX: 0,
             COLUMN_INDEX: 0
         });
@@ -1276,7 +1286,7 @@ export class Operator {
 
     public finalJeopardyShowCategory(): void {
         this.DIV_CLUE_WRAPPER.style.display = ""; //show it by removing "display=none"
-        this.DIV_CLUE_CATEGORY.innerHTML = SCRAPED_GAME.FINAL_JEOPARDY.CATEGORY;
+        this.DIV_CLUE_CATEGORY.innerHTML = this.gameData.FINAL_JEOPARDY.CATEGORY;
         this.TR_QUESTION.style.display = "none";
         this.TR_ANSWER.style.display = "none";
     }
@@ -1284,12 +1294,12 @@ export class Operator {
     public finalJeopardyShowQuestion(): void {
         this.TR_QUESTION.style.display = ""; //show it by removing "display=none"
         this.DIV_CLUE_QUESTION.innerHTML =
-            this.getQuestionHtmlWithSubjectInBold(SCRAPED_GAME.FINAL_JEOPARDY.QUESTION);
+            this.getQuestionHtmlWithSubjectInBold(this.gameData.FINAL_JEOPARDY.QUESTION);
     }
 
     public finalJeopardyShowAnswer(): void {
         this.TR_ANSWER.style.display = ""; //show it by removing "display=none"
-        this.DIV_CLUE_ANSWER.innerHTML = SCRAPED_GAME.FINAL_JEOPARDY.ANSWER;
+        this.DIV_CLUE_ANSWER.innerHTML = this.gameData.FINAL_JEOPARDY.ANSWER;
 
         this.presentation?.setFooterDisplayNone();
 
