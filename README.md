@@ -180,6 +180,40 @@ The line chart captures the game's excitement: team 4 (green line) secured the f
 
 The pie charts can quickly show whether the teams are balanced. To keep the game fun for everyone, I reshuffle team members if any team leading or lagging too much. These pie charts above show that this game was very well balanced (which is why I chose it to include here).
 
+## Running the app
+
+Install dependencies with:
+
+```bash
+npm install
+```
+
+For development mode with hot reloading, run:
+
+```bash
+npm run dev
+```
+
+This starts a Parcel dev server at <http://localhost:1234>.
+
+To create production files, run:
+
+```bash
+npm run build
+```
+
+To build and serve the files locally run:
+
+```bash
+npm run start
+```
+
+This command compiles the project and then serves the built files at <http://localhost:8080>.
+
+The sample game data is stored in `src/scrapedGame.ts`. Run the scraper in `src/scraper/scraper.ts` to generate your own and copy the output to that file.
+
+Open the `operator/operator.html` and `presentation/presentation.html` pages at <http://localhost:1234> when running `npm run dev`, or <http://localhost:8080> when running `npm run start`, in your browser.
+
 ## "Clue" vs "question" vs "answer"
 
 A *clue* contains a category, dollar value, question, and answer.
