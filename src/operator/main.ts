@@ -6,7 +6,7 @@ import { Operator } from "./Operator";
 document.addEventListener("DOMContentLoaded", function () {
     const settings = new Settings();
     const audioManager = new AudioManager();
-    const ttsManager = new TextToSpeechManager("YOUR_ELEVENLABS_API_KEY", "VOICE_ID");
+    const ttsManager = new TextToSpeechManager("YOUR_ELEVENLABS_API_KEY", "17bSMslPF4HPyQrGIXAG");
 
     window.addEventListener("error", function (errorEvent) {
         const errorDiv = document.createElement("div");
