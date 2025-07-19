@@ -202,15 +202,17 @@ To create production files, run:
 npm run build
 ```
 
-After building you can serve the files locally with:
+To build and serve the files locally run:
 
 ```bash
 npm run start
 ```
 
+This command compiles the project and then serves the built files at <http://localhost:8080>.
+
 The sample game data is stored in `src/scrapedGame.ts`. Run the scraper in `src/scraper/scraper.ts` to generate your own and copy the output to that file.
 
-Open the `operator/operator.html` and `presentation/presentation.html` pages at http://localhost:1234 when running `npm run dev`, or http://localhost:8080 when running `npm run start`, in your browser.
+Open the `operator/operator.html` and `presentation/presentation.html` pages at <http://localhost:1234> when running `npm run dev`, or <http://localhost:8080> when running `npm run start`, in your browser.
 
 ## "Clue" vs "question" vs "answer"
 
