@@ -34,7 +34,23 @@ function decodeHtml(str: string): string {
 }
 
 async function fetchJson(url: string): Promise<any> {
-    const response = await fetch(url);
+    let response: Response;
+    const proxy =
+        typeof process !== "undefined" &&
+        (process.env.https_proxy || process.env.HTTPS_PROXY || process.env.http_proxy || process.env.HTTP_PROXY);
+
+    if (proxy && typeof window === "undefined") {
+        try {
+            const { ProxyAgent } = await import("undici");
+            response = await fetch(url, { dispatcher: new ProxyAgent(proxy) });
+        } catch {
+            const { HttpsProxyAgent } = await import("https-proxy-agent");
+            response = await fetch(url, { agent: new HttpsProxyAgent(proxy) as any });
+        }
+    } else {
+        response = await fetch(url);
+    }
+
     if (!response.ok) {
         throw new Error(`HTTP ${response.status} fetching ${url}`);
     }
