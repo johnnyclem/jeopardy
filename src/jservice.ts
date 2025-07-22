@@ -87,10 +87,18 @@ export async function fetchRandomGame(): Promise<Game> {
             ANSWER: finalClue.answer,
         };
 
+        const airdate = new Date(finalClue.airdate);
+        const formattedAirdate = airdate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+        });
+
         return {
             J_ARCHIVE_GAME_ID: finalClue.game_id,
             SHOW_NUMBER: finalClue.game_id,
-            AIRDATE: new Date().toDateString(),
+            AIRDATE: formattedAirdate,
             ROUNDS: rounds,
             FINAL_JEOPARDY: final,
         };

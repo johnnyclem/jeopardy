@@ -39,10 +39,16 @@ function createGame(id: number): Game {
     QUESTION: `Final question ${id}`,
     ANSWER: `Final answer ${id}`,
   };
+  const formattedAirdate = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
   return {
     J_ARCHIVE_GAME_ID: id,
     SHOW_NUMBER: id,
-    AIRDATE: new Date().toDateString(),
+    AIRDATE: formattedAirdate,
     ROUNDS: [singleRound, doubleRound],
     FINAL_JEOPARDY: finalJeopardy,
   };
