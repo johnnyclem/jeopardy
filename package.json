@@ -22,7 +22,7 @@
     "scripts": {
         "dev": "parcel serve",
         "build": "parcel build",
-        "start": "http-server dist",
+        "start": "npm run build && http-server dist"
         "test": "jest"
     },
     "devDependencies": {
