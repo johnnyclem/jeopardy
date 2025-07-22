@@ -202,7 +202,7 @@ To create production files, run:
 npm run build
 ```
 
-After building you can serve the files locally with:
+To build and serve the files locally run:
 
 ```bash
 npm run start
