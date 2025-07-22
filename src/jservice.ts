@@ -13,6 +13,7 @@ export interface JServiceClue {
 }
 
 import { Game, GameRound, Category, RevealedClue, FinalJeopardy, RoundType } from "./typesForGame";
+import { LOCAL_GAMES } from "./localGames";
 
 async function fetchJson(url: string): Promise<any> {
     const response = await fetch(url);
@@ -23,8 +24,13 @@ async function fetchJson(url: string): Promise<any> {
 }
 
 async function fetchCategories(count: number): Promise<{ id: number; title: string }[]> {
-    const cats = await fetchJson(`https://jservice.io/api/categories?count=${count}`);
-    return cats;
+    const requested = count * 2;
+    const cats: { id: number; title: string; clues_count: number }[] = await fetchJson(`https://jservice.io/api/categories?count=${requested}`);
+    const valid = cats.filter(c => c.clues_count >= 5).slice(0, count);
+    if (valid.length < count) {
+        throw new Error("Not enough categories from jservice");
+    }
+    return valid;
 }
 
 async function fetchCluesForCategory(catId: number): Promise<JServiceClue[]> {
@@ -59,32 +65,37 @@ function createGameRound(type: RoundType, categoriesData: { id: number; title: s
 }
 
 export async function fetchRandomGame(): Promise<Game> {
-    const roundTypes: RoundType[] = ["single", "double"];
-    const rounds: GameRound[] = [];
+    try {
+        const roundTypes: RoundType[] = ["single", "double"];
+        const rounds: GameRound[] = [];
 
-    for (const type of roundTypes) {
-        const categories = await fetchCategories(6);
-        const cluesPerCategory: JServiceClue[][] = [];
-        for (const cat of categories) {
-            const clues = await fetchCluesForCategory(cat.id);
-            cluesPerCategory.push(clues.slice(0, 5));
+        for (const type of roundTypes) {
+            const categories = await fetchCategories(6);
+            const cluesPerCategory: JServiceClue[][] = [];
+            for (const cat of categories) {
+                const clues = await fetchCluesForCategory(cat.id);
+                cluesPerCategory.push(clues.slice(0, 5));
+            }
+            rounds.push(createGameRound(type, categories, cluesPerCategory));
         }
-        rounds.push(createGameRound(type, categories, cluesPerCategory));
+
+        const finalClueArr: JServiceClue[] = await fetchJson("https://jservice.io/api/random");
+        const finalClue = finalClueArr[0];
+        const final: FinalJeopardy = {
+            CATEGORY: finalClue.category.title,
+            QUESTION: finalClue.question,
+            ANSWER: finalClue.answer,
+        };
+
+        return {
+            J_ARCHIVE_GAME_ID: finalClue.game_id,
+            SHOW_NUMBER: finalClue.game_id,
+            AIRDATE: new Date().toDateString(),
+            ROUNDS: rounds,
+            FINAL_JEOPARDY: final,
+        };
+    } catch (er) {
+        const randomIndex = Math.floor(Math.random() * LOCAL_GAMES.length);
+        return LOCAL_GAMES[randomIndex];
     }
-
-    const finalClueArr: JServiceClue[] = await fetchJson("https://jservice.io/api/random");
-    const finalClue = finalClueArr[0];
-    const final: FinalJeopardy = {
-        CATEGORY: finalClue.category.title,
-        QUESTION: finalClue.question,
-        ANSWER: finalClue.answer,
-    };
-
-    return {
-        J_ARCHIVE_GAME_ID: finalClue.game_id,
-        SHOW_NUMBER: finalClue.game_id,
-        AIRDATE: new Date().toDateString(),
-        ROUNDS: rounds,
-        FINAL_JEOPARDY: final,
-    };
 }
