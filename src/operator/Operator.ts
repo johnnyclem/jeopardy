@@ -12,6 +12,7 @@ import { Presentation } from "../presentation/Presentation";
 import { fetchRandomGame } from "../jservice";
 import { SCRAPED_GAME } from "../scrapedGame";
 import { checkSpecialCategory, SpecialCategory } from "../specialCategories";
+import { initSpecialCategoryPopup, setSpecialCategoryPopupContent, SpecialCategoryPopupElements } from "../specialCategoryPopup";
 import { StateMachine } from "../stateMachine/StateMachine";
 import { Game, RevealedClue } from "../typesForGame";
 
@@ -45,15 +46,10 @@ export class Operator {
     private readonly BUTTON_ADD_TIME_TO_GAME_ROUND_TIMER: HTMLButtonElement;
     private readonly DIV_SPECIAL_CATEGORY_PROMPT: HTMLDivElement;
     private readonly SPAN_SPECIAL_CATEGORY_PROMPT_TITLE: HTMLSpanElement;
-    private readonly DIV_SPECIAL_CATEGORY_POPUP: HTMLDivElement;
     private readonly DIV_BUZZ_HISTORY_POPUP: HTMLDivElement;
     private readonly DIV_BACKDROP_FOR_POPUPS: HTMLDivElement;
 
-    private readonly SPECIAL_CATEGORY_POPUP_TITLE: HTMLElement;
-    private readonly SPECIAL_CATEGORY_POPUP_DESCRIPTION: HTMLElement;
-    private readonly SPECIAL_CATEGORY_POPUP_EXAMPLE_CATEGORY: HTMLElement;
-    private readonly SPECIAL_CATEGORY_POPUP_EXAMPLE_QUESTION: HTMLElement;
-    private readonly SPECIAL_CATEGORY_POPUP_EXAMPLE_ANSWER: HTMLElement;
+    private readonly specialCategoryPopup: SpecialCategoryPopupElements;
 
     private readonly DIV_GAME_END_POPUP_BUTTONS: HTMLDivElement;
     private readonly DIV_GAME_END_POPUP: HTMLDivElement;
@@ -118,12 +114,7 @@ export class Operator {
         this.DIV_SPECIAL_CATEGORY_PROMPT = querySelectorAndCheck(document, "div#special-category-prompt");
         this.SPAN_SPECIAL_CATEGORY_PROMPT_TITLE = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_PROMPT, "span#special-category-prompt-title");
 
-        this.DIV_SPECIAL_CATEGORY_POPUP = querySelectorAndCheck(document, "div#special-category-popup");
-        this.SPECIAL_CATEGORY_POPUP_TITLE = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, ".popup-title");
-        this.SPECIAL_CATEGORY_POPUP_DESCRIPTION = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-description");
-        this.SPECIAL_CATEGORY_POPUP_EXAMPLE_CATEGORY = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-example-category");
-        this.SPECIAL_CATEGORY_POPUP_EXAMPLE_QUESTION = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-example-question");
-        this.SPECIAL_CATEGORY_POPUP_EXAMPLE_ANSWER = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-example-answer");
+        this.specialCategoryPopup = initSpecialCategoryPopup(document);
 
         this.DIV_GAME_END_POPUP = querySelectorAndCheck<HTMLDivElement>(document, "div#game-end-popup");
         this.DIV_GAME_END_POPUP_BUTTONS = querySelectorAndCheck<HTMLDivElement>(this.DIV_GAME_END_POPUP, "div#game-end-popup-buttons");
@@ -727,24 +718,15 @@ export class Operator {
 
         this.presentation?.specialCategoryPopupShow(specialCategory);
 
-        this.SPECIAL_CATEGORY_POPUP_TITLE.innerHTML = specialCategory.DISPLAY_NAME;
-        this.SPECIAL_CATEGORY_POPUP_DESCRIPTION.innerHTML = specialCategory.DESCRIPTION;
-        if (specialCategory.EXAMPLE) {
-            this.DIV_SPECIAL_CATEGORY_POPUP.classList.remove("no-example");
-            this.SPECIAL_CATEGORY_POPUP_EXAMPLE_CATEGORY.innerHTML = specialCategory.EXAMPLE.CATEGORY;
-            this.SPECIAL_CATEGORY_POPUP_EXAMPLE_QUESTION.innerHTML = specialCategory.EXAMPLE.QUESTION;
-            this.SPECIAL_CATEGORY_POPUP_EXAMPLE_ANSWER.innerHTML = specialCategory.EXAMPLE.ANSWER;
-        } else {
-            this.DIV_SPECIAL_CATEGORY_POPUP.classList.add("no-example");
-        }
+        setSpecialCategoryPopupContent(this.specialCategoryPopup, specialCategory);
 
-        this.DIV_SPECIAL_CATEGORY_POPUP.setAttribute("data-popup-visibility", "visible");
+        this.specialCategoryPopup.container.setAttribute("data-popup-visibility", "visible");
         this.backdropForPopupsShow();
     }
 
     public specialCategoryPopupHide(): void {
         this.backdropForPopupsHide();
-        this.DIV_SPECIAL_CATEGORY_POPUP.setAttribute("data-popup-visibility", "hidden");
+        this.specialCategoryPopup.container.setAttribute("data-popup-visibility", "hidden");
         this.presentation?.specialCategoryPopupHide();
         this.GAME_ROUND_TIMER.resume();
     }

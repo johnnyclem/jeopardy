@@ -2,6 +2,7 @@ import { GameBoard } from "../GameBoard";
 import { querySelectorAndCheck } from "../commonFunctions";
 import { Operator } from "../operator/Operator";
 import { SpecialCategory } from "../specialCategories";
+import { initSpecialCategoryPopup, setSpecialCategoryPopupContent, SpecialCategoryPopupElements } from "../specialCategoryPopup";
 import { GameRound, RevealedClue } from "../typesForGame";
 
 export class Presentation {
@@ -25,12 +26,7 @@ export class Presentation {
     private readonly DIV_SLIDE_ROUND_START: HTMLDivElement;
 
     private readonly DIV_BACKDROP_FOR_POPUPS: HTMLDivElement;
-    private readonly DIV_SPECIAL_CATEGORY_POPUP: HTMLDivElement;
-    private readonly SPECIAL_CATEGORY_TITLE: HTMLElement;
-    private readonly SPECIAL_CATEGORY_DESCRIPTION: HTMLElement;
-    private readonly SPECIAL_CATEGORY_EXAMPLE_CATEGORY: HTMLElement;
-    private readonly SPECIAL_CATEGORY_EXAMPLE_QUESTION: HTMLElement;
-    private readonly SPECIAL_CATEGORY_EXAMPLE_ANSWER: HTMLElement;
+    private readonly specialCategoryPopup: SpecialCategoryPopupElements;
 
     private readonly DIV_PAUSED: HTMLDivElement;
     private readonly FOOTER: HTMLElement;
@@ -66,12 +62,7 @@ export class Presentation {
         this.DIV_CLUE_VALUE_BIG = querySelectorAndCheck(document, "div#clue-value-big");
 
         this.DIV_BACKDROP_FOR_POPUPS = querySelectorAndCheck(document, "div#backdrop-for-popups");
-        this.DIV_SPECIAL_CATEGORY_POPUP = querySelectorAndCheck(document, "div#special-category-popup");
-        this.SPECIAL_CATEGORY_TITLE = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "span.popup-title");
-        this.SPECIAL_CATEGORY_DESCRIPTION = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-description");
-        this.SPECIAL_CATEGORY_EXAMPLE_CATEGORY = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-example-category");
-        this.SPECIAL_CATEGORY_EXAMPLE_QUESTION = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-example-question");
-        this.SPECIAL_CATEGORY_EXAMPLE_ANSWER = querySelectorAndCheck(this.DIV_SPECIAL_CATEGORY_POPUP, "#special-category-popup-example-answer");
+        this.specialCategoryPopup = initSpecialCategoryPopup(document);
 
         this.DIV_GAME_END_TEAM_RANKING_TABLE = querySelectorAndCheck(document, "div#slide-gameEnd-team-ranking-table div#team-ranking");
         this.DIV_GAME_END_PIE_CHART_CONTAINER = querySelectorAndCheck(document, "div#slide-gameEnd-pie-charts div#pie-charts");
@@ -242,24 +233,14 @@ export class Presentation {
 
     public specialCategoryPopupShow(specialCategory: SpecialCategory): void {
 
-        this.SPECIAL_CATEGORY_TITLE.innerHTML = specialCategory.DISPLAY_NAME;
-        this.SPECIAL_CATEGORY_DESCRIPTION.innerHTML = specialCategory.DESCRIPTION;
-        if (specialCategory.EXAMPLE) {
-            this.DIV_SPECIAL_CATEGORY_POPUP.classList.remove("no-example");
-            this.SPECIAL_CATEGORY_EXAMPLE_CATEGORY.innerHTML = specialCategory.EXAMPLE.CATEGORY;
-            this.SPECIAL_CATEGORY_EXAMPLE_QUESTION.innerHTML = specialCategory.EXAMPLE.QUESTION;
-            this.SPECIAL_CATEGORY_EXAMPLE_ANSWER.innerHTML = specialCategory.EXAMPLE.ANSWER;
-        } else {
-            this.DIV_SPECIAL_CATEGORY_POPUP.classList.add("no-example");
-        }
-
+        setSpecialCategoryPopupContent(this.specialCategoryPopup, specialCategory);
         this.DIV_BACKDROP_FOR_POPUPS.setAttribute("data-backdrop-state", "enabled");
-        this.DIV_SPECIAL_CATEGORY_POPUP.setAttribute("data-popup-visibility", "visible");
+        this.specialCategoryPopup.container.setAttribute("data-popup-visibility", "visible");
     }
 
     public specialCategoryPopupHide(): void {
         this.DIV_BACKDROP_FOR_POPUPS.setAttribute("data-backdrop-state", "disabled");
-        this.DIV_SPECIAL_CATEGORY_POPUP.setAttribute("data-popup-visibility", "hidden");
+        this.specialCategoryPopup.container.setAttribute("data-popup-visibility", "hidden");
     }
 
     public getBuzzHistorySvg(): SVGSVGElement {
